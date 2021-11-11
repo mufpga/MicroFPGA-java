@@ -9,101 +9,6 @@ public class LaserTrigger {
 	private final Duration duration_;
 	private final Sequence sequence_;
 
-	public enum LaserTriggerMode{
-		OFF(0), ON(1), RISING(2), FALLING(3), FOLLOWING(4);
-
-		private final int value_;
-
-		LaserTriggerMode(int i){
-			value_ = i;
-		}
-
-		public int getValue(){
-			return value_;
-		}
-
-		public static LaserTriggerMode getMode(int i){
-			switch (i){
-				case 1:
-					return ON;
-				case 2:
-					return RISING;
-				case 3:
-					return FALLING;
-				case 4:
-					return FOLLOWING;
-				default:
-					return OFF;
-			}
-		}
-	}
-
-	public class Parameters {
-
-		public final static String KEY_MODE = "Mode";
-		public final static String KEY_DURATION = "Duration";
-		public final static String KEY_SEQUENCE = "Sequence";
-
-		private LaserTriggerMode mode_;
-		private int duration_;
-		private int sequence_;
-
-		public Parameters(LaserTriggerMode mode, int duration, String sequence){
-			setMode(mode);
-			setDuration(duration);
-			setSequence(sequence);
-		}
-
-		public Parameters(LaserTriggerMode mode, int duration, int sequence){
-			setMode(mode);
-			setDuration(duration);
-			setSequence(sequence);
-		}
-
-		public void setMode(LaserTriggerMode mode){
-			mode_ = mode;
-		}
-
-		public void setDuration(int duration){
-			if(duration >= 0 && duration <= Duration.MAX)
-				duration_ = duration;
-		}
-
-		public void setSequence(String sequence){
-			int seq = formatSequence(sequence);
-
-			if(seq != -1) sequence_ = seq;
-		}
-
-		protected void setSequence(int sequence){
-			if(sequence >= 0 && sequence <= Sequence.MAX)
-				duration_ = sequence;
-		}
-
-		public LaserTriggerMode getMode(){return mode_;}
-
-		public int getDuration(){return duration_;}
-
-		public String getFormattedSequence(){return LaserTrigger.stringSequence(sequence_);}
-
-		protected int getSequence(){return sequence_;}
-
-		public void setValues(LaserTriggerMode mode, int duration, String sequence){
-			setMode(mode);
-			setDuration(duration);
-			setSequence(sequence);
-		}
-
-		@Override
-		public String toString(){
-			String s = "["+KEY_MODE+": "+mode_.toString()+", "
-					+KEY_DURATION+": "+duration_+" us, "
-					+KEY_SEQUENCE+": "+getFormattedSequence()+"]";
-
-			return s;
-		}
-	}
-	
 	protected LaserTrigger(int id, RegisterInterface regint) {
 		id_ = id;
 
@@ -112,7 +17,7 @@ public class LaserTrigger {
 		sequence_ = new Sequence(id_, regint);
 	}
 
-	public boolean setParameters(Parameters p){
+	public boolean setParameters(LaserParameters p){
 		boolean b = mode_.setTriggerMode(p.getMode());
 		if(!b) return false;
 
@@ -124,9 +29,9 @@ public class LaserTrigger {
 		return b;
 	}
 
-	public Parameters getParameters(){
+	public LaserParameters getParameters(){
 
-		Parameters p = new Parameters(
+		LaserParameters p = new LaserParameters(
 				LaserTriggerMode.getMode(mode_.getState()),
 				duration_.getState(),
 				sequence_.getState()

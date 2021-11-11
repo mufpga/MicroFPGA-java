@@ -40,10 +40,10 @@ public abstract class Signal {
 	private final int id_;
 	protected final RegisterInterface regInt_;
 	
-	protected Signal(int id, RegisterInterface regint, boolean readOnly) {
+	protected Signal(int id, RegisterInterface regInt, boolean readOnly) {
 		id_ = id;
 		readOnly_ = readOnly;
-		regInt_ = regint;
+		regInt_ = regInt;
 	}
 	
 	public boolean isReadOnly() {

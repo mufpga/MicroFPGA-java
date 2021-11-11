@@ -106,18 +106,18 @@ public class MicroFPGAController {
 		return ais_.size();
 	}
 	
-	public boolean setTTLState(int channel, int state) {
+	public boolean setTTLState(int channel, boolean state) {
 		if(connected_ && channel >= 0 && channel < getNumberTTLs()) {
-			return ttls_.get(channel).setState( state == TTL.ON ? TTL.ON : TTL.OFF );
+			return ttls_.get(channel).setState( state ? TTL.ON : TTL.OFF );
 		}
 		return false;
 	}
 	
-	public int getTTLState(int channel) {
+	public boolean getTTLState(int channel) {
 		if(connected_ && channel >= 0 && channel < getNumberTTLs()) {
-			return ttls_.get(channel).getState();
+			return ttls_.get(channel).getState() == TTL.ON;
 		}
-		return -1;
+		return false;
 	}
 	
 	public boolean setPWMState(int channel, int state) {
@@ -148,33 +148,14 @@ public class MicroFPGAController {
 		return -1;
 	}
 
-	public boolean setLaserState(int channel, int mode, int duration, int sequence) {
-		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
-			LaserTrigger lt = lasers_.get(channel);
-			
-			boolean b = lt.setMode(mode);
-			if(!b) return false;
-			
-			b = lt.setDuration(duration);
-			if(!b) return false;
-			
-			b = lt.setSequence(sequence);
-
-			return b;
+	public int getAnalogInputState(int channel){
+		if(connected_ && channel >= 0 && channel < getNumberAIs()) {
+			return ais_.get(channel).getState();
 		}
-		return false;
+		return -1;
 	}
 
-	public int[] getLaserState(int channel) {
-		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
-			LaserTrigger lt = lasers_.get(channel);
-			
-			return new int[] {lt.getMode(), lt.getDuration(), lt.getSequence()};
-		}
-		return new int[] {-1, -1, -1};
-	}
-
-	public boolean setLaserParameters(int channel, LaserTrigger.Parameters p) {
+	public boolean setLaserParameters(int channel, LaserParameters p) {
 		if (connected_ && channel >= 0 && channel < getNumberLasers()) {
 			lasers_.get(channel).setParameters(p);
 		}
@@ -188,7 +169,7 @@ public class MicroFPGAController {
 		return "Not connected, or wrong channel number.";
 	}
 
-	public LaserTrigger.Parameters getLaserParameters(int channel){
+	public LaserParameters getLaserParameters(int channel){
 		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
 			return lasers_.get(channel).getParameters();
 		}
@@ -257,12 +238,12 @@ public class MicroFPGAController {
 		else return false;
 	}
 
-	public boolean setCameraTriggerParameters(CameraTrigger.Parameters p){
+	public boolean setCameraTriggerParameters(CameraParameters p){
 		if(connected_ && cam_ != null) return cam_.setParameters(p);
 		else return false;
 	}
 
-	public CameraTrigger.Parameters getCameraTriggerParameters(){
+	public CameraParameters getCameraTriggerParameters(){
 		if(connected_ && cam_ != null) return cam_.getParameters();
 		else return null;
 	}

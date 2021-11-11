@@ -3,7 +3,7 @@ package de.embl.rieslab.microfpga.devices;
 import de.embl.rieslab.microfpga.regint.RegisterInterface;
 
 public class TTL extends Signal {
-	
+
 	public final static int ON = 1;
 	public final static int OFF = 0; 
 	

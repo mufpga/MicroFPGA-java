@@ -46,4 +46,10 @@ public class LaserTriggerTest {
         assertEquals("1100110011001100", LaserTrigger.stringSequence(52428));
         assertEquals("1000100010001000", LaserTrigger.stringSequence(34952));
     }
+
+    @Test
+    public void testInverse(){
+        int i = 41445;
+        assertEquals(i, LaserTrigger.formatSequence(LaserTrigger.stringSequence(i)));
+    }
 }
