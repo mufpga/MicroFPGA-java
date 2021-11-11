@@ -56,7 +56,8 @@ public class DeviceFactory {
 	}
 
 	public CameraTrigger getCameraTrigger(){
-		if(counterCamera_ < 0){
+		if(counterCamera_ < 1){
+			counterCamera_++;
 			return CameraTrigger.getInstance(regInt_);
 		}
 		return null;
