@@ -1,6 +1,5 @@
 package de.embl.rieslab.microfpga.devices;
 
-import de.embl.rieslab.microfpga.MicroFPGAController;
 import de.embl.rieslab.microfpga.regint.RegisterInterface;
 
 public class AnalogInput extends Signal{
@@ -21,7 +20,7 @@ public class AnalogInput extends Signal{
 
 	@Override
 	public int getBaseAddress() {
-		return MicroFPGAController.ADDR_ANALOG_INPUT;
+		return Signal.ADDR_ANALOG_INPUT;
 	}
 
 }

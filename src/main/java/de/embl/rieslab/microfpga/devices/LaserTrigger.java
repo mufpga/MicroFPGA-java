@@ -1,9 +1,6 @@
 package de.embl.rieslab.microfpga.devices;
 
-import de.embl.rieslab.microfpga.MicroFPGAController;
 import de.embl.rieslab.microfpga.regint.RegisterInterface;
-
-import java.util.HashMap;
 
 public class LaserTrigger {
 
@@ -11,6 +8,35 @@ public class LaserTrigger {
 	private final Mode mode_;
 	private final Duration duration_;
 	private final Sequence sequence_;
+
+	public enum LaserTriggerMode{
+		OFF(0), ON(1), RISING(2), FALLING(3), FOLLOWING(4);
+
+		private final int value_;
+
+		LaserTriggerMode(int i){
+			value_ = i;
+		}
+
+		public int getValue(){
+			return value_;
+		}
+
+		public static LaserTriggerMode getMode(int i){
+			switch (i){
+				case 1:
+					return ON;
+				case 2:
+					return RISING;
+				case 3:
+					return FALLING;
+				case 4:
+					return FOLLOWING;
+				default:
+					return OFF;
+			}
+		}
+	}
 
 	public class Parameters {
 
@@ -28,12 +54,19 @@ public class LaserTrigger {
 			setSequence(sequence);
 		}
 
+		public Parameters(LaserTriggerMode mode, int duration, int sequence){
+			setMode(mode);
+			setDuration(duration);
+			setSequence(sequence);
+		}
+
 		public void setMode(LaserTriggerMode mode){
 			mode_ = mode;
 		}
 
 		public void setDuration(int duration){
-			duration_ = duration;
+			if(duration >= 0 && duration <= Duration.MAX)
+				duration_ = duration;
 		}
 
 		public void setSequence(String sequence){
@@ -42,41 +75,32 @@ public class LaserTrigger {
 			if(seq != -1) sequence_ = seq;
 		}
 
-		public double getPulseMs(){return mode_ / 10.;}
-
-		public double getPeriodMs(){return duration_ / 10.;}
-
-		public double getExposureMs(){return sequence_ / 10.;}
-
-		public double getDelayMs(){return delay_ / 100.;}
-
-		public void setParametersMs(double pulse, double period, double exposure, double delay){
-			setMode(pulse);
-			setDuration(period);
-			setExposureMs(exposure);
-			setDelayMs(delay);
+		protected void setSequence(int sequence){
+			if(sequence >= 0 && sequence <= Sequence.MAX)
+				duration_ = sequence;
 		}
 
-		public HashMap<String, Double> getParametersMs(){
-			HashMap map = new HashMap<String, Double>(4);
+		public LaserTriggerMode getMode(){return mode_;}
 
-			map.put(KEY_MODE, getPulseMs());
-			map.put(KEY_DURATION, getPeriodMs());
-			map.put(KEY_SEQUENCE, getExposureMs());
-			map.put(KEY_DELAY, getDelayMs());
+		public int getDuration(){return duration_;}
 
-			return map;
+		public String getFormattedSequence(){return LaserTrigger.stringSequence(sequence_);}
+
+		protected int getSequence(){return sequence_;}
+
+		public void setValues(LaserTriggerMode mode, int duration, String sequence){
+			setMode(mode);
+			setDuration(duration);
+			setSequence(sequence);
 		}
 
-		protected HashMap<String, Integer> getParameters(){
-			HashMap map = new HashMap<String, Double>(4);
+		@Override
+		public String toString(){
+			String s = "["+KEY_MODE+": "+mode_.toString()+", "
+					+KEY_DURATION+": "+duration_+" us, "
+					+KEY_SEQUENCE+": "+getFormattedSequence()+"]";
 
-			map.put(KEY_MODE, mode_);
-			map.put(KEY_DURATION, duration_);
-			map.put(KEY_SEQUENCE, sequence_);
-			map.put(KEY_DELAY, delay_);
-
-			return map;
+			return s;
 		}
 	}
 	
@@ -86,6 +110,33 @@ public class LaserTrigger {
 		mode_ = new Mode(id_, regint);
 		duration_ = new Duration(id_, regint);
 		sequence_ = new Sequence(id_, regint);
+	}
+
+	public boolean setParameters(Parameters p){
+		boolean b = mode_.setTriggerMode(p.getMode());
+		if(!b) return false;
+
+		b = duration_.setState(p.getDuration());
+		if(!b) return false;
+
+		b = sequence_.setState(p.getSequence());
+
+		return b;
+	}
+
+	public Parameters getParameters(){
+
+		Parameters p = new Parameters(
+				LaserTriggerMode.getMode(mode_.getState()),
+				duration_.getState(),
+				sequence_.getState()
+		);
+
+		return p;
+	}
+
+	public String getParametersPretty(){
+		return getParameters().toString();
 	}
 
 	public boolean setMode(int value) {
@@ -103,13 +154,25 @@ public class LaserTrigger {
 	public int getDuration() {
 		return duration_.getState();
 	}
-	
+
 	public boolean setSequence(int value) {
 		return sequence_.setState(value);
 	}
-	
+
+	public boolean setSequence(String s) {
+		int value = formatSequence(s);
+
+		if(value < 0) return false;
+
+		return sequence_.setState(value);
+	}
+
 	public int getSequence() {
 		return sequence_.getState();
+	}
+
+	public String getStringSequence() {
+		return stringSequence(sequence_.getState());
 	}
 	
 	/**
@@ -127,13 +190,13 @@ public class LaserTrigger {
 		return Integer.parseInt(s, 2);
 	}
 
-	public static String getSequence(int i){
+	protected static String stringSequence(int i){
 		if(i<0 || i>Sequence.MAX) return "";
 
 		int value = i;
 		StringBuilder sb = new StringBuilder();
 		for(int j=15; j>=0; j--){
-			if(value <  Math.pow(2, j)){
+			if(value >= Math.pow(2, j)){
 				value = value - (int) Math.pow(2, j);
 				sb.append("1");
 			} else {
@@ -153,26 +216,12 @@ public class LaserTrigger {
 		return true;
 	}
 
-	public enum LaserTriggerMode{
-		OFF(0), ON(1), RISING(2), FALLING(3), FOLLOWING(4);
-
-		private final int value_;
-
-		LaserTriggerMode(int i){
-			value_ = i;
-		}
-
-		public int getValue(){
-			return value_;
-		}
-	}
-
 	public class Mode extends Signal{
 
 		public static final int MAX = 4;
 
 		protected Mode(int id, RegisterInterface regint) {
-			super(id, Direction.OUTPUT, regint);
+			super(id, regint, false);
 		}
 
 		@Override
@@ -184,7 +233,7 @@ public class LaserTrigger {
 
 		@Override
 		public int getBaseAddress() {
-			return MicroFPGAController.ADDR_MODE;
+			return Signal.ADDR_MODE;
 		}
 	}
 	
@@ -193,7 +242,7 @@ public class LaserTrigger {
 		public static final int MAX = 65535;
 
 		protected Duration(int id, RegisterInterface regint) {
-			super(id, Direction.OUTPUT, regint);
+			super(id, regint, false);
 		}
 
 		@Override
@@ -203,7 +252,7 @@ public class LaserTrigger {
 
 		@Override
 		public int getBaseAddress() {
-			return MicroFPGAController.ADDR_DURA;
+			return Signal.ADDR_DURA;
 		}
 	}
 	
@@ -212,7 +261,7 @@ public class LaserTrigger {
 		public static final int MAX = 65535;
 		
 		protected Sequence(int id, RegisterInterface regint) {
-			super(id, Direction.OUTPUT, regint);
+			super(id, regint, false);
 		}
 
 		@Override
@@ -222,7 +271,7 @@ public class LaserTrigger {
 
 		@Override
 		public int getBaseAddress() {
-			return MicroFPGAController.ADDR_SEQ;
+			return Signal.ADDR_SEQ;
 		}
 	}
 }

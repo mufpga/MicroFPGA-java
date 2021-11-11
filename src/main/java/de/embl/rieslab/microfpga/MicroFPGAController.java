@@ -2,53 +2,17 @@ package de.embl.rieslab.microfpga;
 
 import java.util.ArrayList;
 
-import de.embl.rieslab.microfpga.devices.AnalogInput;
-import de.embl.rieslab.microfpga.devices.DeviceFactory;
-import de.embl.rieslab.microfpga.devices.LaserTrigger;
-import de.embl.rieslab.microfpga.devices.PWM;
-import de.embl.rieslab.microfpga.devices.Servo;
-import de.embl.rieslab.microfpga.devices.TTL;
+import de.embl.rieslab.microfpga.devices.*;
 import de.embl.rieslab.microfpga.regint.RegisterInterface;
 
 public class MicroFPGAController {
 
-	public final static int NM_TTL = 4;
-	public final static int NM_PWM = 5;
-	public final static int NM_LASER = 8;
-	public final static int NM_SERVO = 7;
-	public final static int NM_AI = 8;
-	
-	public final static int ADDR_MODE = 0;
-	public static final int ADDR_DURA = ADDR_MODE+ NM_LASER;
-	public static final int ADDR_SEQ = ADDR_DURA+ NM_LASER;
-	public static final int ADDR_TTL = ADDR_SEQ+ NM_LASER;
-	public static final int ADDR_SERVO = ADDR_TTL+ NM_TTL;
-	public static final int ADDR_PWM = ADDR_SERVO+ NM_SERVO;
-
-	public static final int ADDR_ACTIVE_TRIGGER = ADDR_PWM + NM_PWM;
-	public static final int ADDR_START_TRIGGER = ADDR_ACTIVE_TRIGGER + 1;
-	public static final int ADDR_CAM_PULSE = ADDR_START_TRIGGER + 1;
-	public static final int ADDR_CAM_PERIOD = ADDR_CAM_PULSE + 1;
-	public static final int ADDR_CAM_EXPO = ADDR_CAM_PERIOD + 1;
-	public static final int ADDR_LASER_DELAY = ADDR_CAM_EXPO + 1;
-
-	public static final int ADDR_ANALOG_INPUT = ADDR_LASER_DELAY + 1;
-	
-	public static final int ADDR_VERSION = 200;
-	public static final int ADDR_ID = 201;
-	
-	public static final int ERROR_UNKNOWN_COMMAND = 11206655;
-
-	public static final int ID_AU = 79;
-	public static final int ID_AUP = 80;
-	public static final int ID_CU = 29;
-	public static final int CURRENT_VERSION = 3;
-	
 	private ArrayList<TTL> ttls_;
 	private ArrayList<PWM> pwms_;
 	private ArrayList<LaserTrigger> lasers_;
 	private ArrayList<Servo> servos_;
 	private ArrayList<AnalogInput> ais_;
+	private CameraTrigger cam_;
 	
 	private boolean connected_;
 	
@@ -56,7 +20,8 @@ public class MicroFPGAController {
 	private final int id_;
 	private final int version_;
 	
-	public MicroFPGAController(int nLasers, int nTTLs, int nServos, int nPWMs, int nAIs) throws Exception {
+	public MicroFPGAController(int nLasers, int nTTLs, int nServos, int nPWMs,
+							   int nAIs, boolean useCamera) throws Exception {
 
 		regint_ = new RegisterInterface();
 
@@ -64,11 +29,11 @@ public class MicroFPGAController {
 		connected_ = regint_.connect();
 		
 		if(connected_){
-			version_  = regint_.read(ADDR_VERSION);
-			id_ = regint_.read(ADDR_ID);
+			version_  = regint_.read(Signal.ADDR_VERSION);
+			id_ = regint_.read(Signal.ADDR_ID);
 			
-			if(CURRENT_VERSION == version_ &&
-					( (id_ == ID_AU) ||(id_ == ID_AUP) || (id_ == ID_CU) ) ) {
+			if(Signal.CURRENT_VERSION == version_ &&
+					( (id_ == Signal.ID_AU) ||(id_ == Signal.ID_AUP) || (id_ == Signal.ID_CU) ) ) {
 				DeviceFactory factory = new DeviceFactory(regint_);
 				
 				ttls_ = new ArrayList<TTL>();
@@ -90,19 +55,26 @@ public class MicroFPGAController {
 					servos_.add(factory.getServo());
 				}
 
-				if ((id_ == ID_AU) || (id_ == ID_AUP)) {
+				if ((id_ == Signal.ID_AU) || (id_ == Signal.ID_AUP)) {
 					for (int i = 0; i < nAIs; i++) {
 						ais_.add(factory.getAI());
 					}
 				}
+
+				if(useCamera){
+					cam_ = factory.getCameraTrigger();
+				} else {
+					factory.getCameraTrigger().setPassiveTrigger();
+				}
+
 			} else {
 				regint_.disconnect();
 				
-				if(CURRENT_VERSION != version_) {
+				if(Signal.CURRENT_VERSION != version_) {
 					throw new Exception("Incorrect firmware version ("+version_+"), expected version 2.");
 				}
-				if( (id_ != ID_AU) && (id_ != ID_AUP) && (id_ != ID_CU) ) {
-					throw new Exception("Unknown device id ("+id_+"), expected version 49 (Cu) or 79 (Au).");
+				if( (id_ != Signal.ID_AU) && (id_ != Signal.ID_AUP) && (id_ != Signal.ID_CU) ) {
+					throw new Exception("Unknown device id ("+id_+"), expected version 49 (Cu), 79 (Au) or 80 (Au+).");
 				}
 			}
 		} else {
@@ -180,21 +152,19 @@ public class MicroFPGAController {
 		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
 			LaserTrigger lt = lasers_.get(channel);
 			
-			boolean b;
-			b = lt.setMode(mode);
-			if(!b)
-				return b;
+			boolean b = lt.setMode(mode);
+			if(!b) return false;
 			
 			b = lt.setDuration(duration);
-			if(!b)
-				return b;
+			if(!b) return false;
 			
 			b = lt.setSequence(sequence);
+
 			return b;
 		}
 		return false;
 	}
-	
+
 	public int[] getLaserState(int channel) {
 		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
 			LaserTrigger lt = lasers_.get(channel);
@@ -202,6 +172,27 @@ public class MicroFPGAController {
 			return new int[] {lt.getMode(), lt.getDuration(), lt.getSequence()};
 		}
 		return new int[] {-1, -1, -1};
+	}
+
+	public boolean setLaserParameters(int channel, LaserTrigger.Parameters p) {
+		if (connected_ && channel >= 0 && channel < getNumberLasers()) {
+			lasers_.get(channel).setParameters(p);
+		}
+		return false;
+	}
+
+	public String getLaserParametersPretty(int channel){
+		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
+			return lasers_.get(channel).getParametersPretty();
+		}
+		return "Not connected, or wrong channel number.";
+	}
+
+	public LaserTrigger.Parameters getLaserParameters(int channel){
+		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
+			return lasers_.get(channel).getParameters();
+		}
+		return null;
 	}
 
 	public boolean setLaserModeState(int channel, int state) {
@@ -226,12 +217,11 @@ public class MicroFPGAController {
 	}
 	
 	public int getLaserDurationState(int channel) {
-		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
+		if (connected_ && channel >= 0 && channel < getNumberLasers()) {
 			return lasers_.get(channel).getDuration();
 		}
 		return -1;
 	}
-	
 	
 	public boolean setLaserSequenceState(int channel, int state) {
 		if(connected_ && channel >= 0 && channel < getNumberLasers()) {
@@ -247,11 +237,55 @@ public class MicroFPGAController {
 		return -1;
 	}
 
+	public boolean setActiveTrigger(){
+		if(connected_ && cam_ != null) return cam_.setActiveTrigger();
+		else return false;
+	}
+
+	public boolean setPassiveTrigger(){
+		if(connected_ && cam_ != null) return cam_.setPassiveTrigger();
+		else return false;
+	}
+
+	public boolean startCamera(){
+		if(connected_ && cam_ != null) return cam_.start();
+		else return false;
+	}
+
+	public boolean stopCamera(){
+		if(connected_ && cam_ != null) return cam_.stop();
+		else return false;
+	}
+
+	public boolean setCameraTriggerParameters(CameraTrigger.Parameters p){
+		if(connected_ && cam_ != null) return cam_.setParameters(p);
+		else return false;
+	}
+
+	public CameraTrigger.Parameters getCameraTriggerParameters(){
+		if(connected_ && cam_ != null) return cam_.getParameters();
+		else return null;
+	}
+	public String getCameraTriggerParametersPretty(){
+		if(!connected_) return "Not connected.";
+
+		if(cam_ != null) return cam_.getParametersPretty();
+		else return "Camera not instantiated.";
+	}
+
 	public String getID() {
 		if(connected_) {
-			return (id_ == ID_AU) ? "Au" : "Cu";
+			switch(id_){
+				case Signal.ID_AU:
+					return "Au";
+				case Signal.ID_CU:
+					return "Cu";
+				case Signal.ID_AUP:
+					return "Au+";
+			}
+			return "Unknown device";
 		}
-		return "-1";
+		return "Not connected";
 	}
 	
 }

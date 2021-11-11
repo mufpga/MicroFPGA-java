@@ -1,25 +1,22 @@
 package de.embl.rieslab.microfpga.devices;
 
-import de.embl.rieslab.microfpga.MicroFPGAController;
 import de.embl.rieslab.microfpga.regint.RegisterInterface;
 
 public class Servo extends Signal{
 
 	public static final int MAX = 65535;
-	public static final int MIN = 0;
-	
-	protected Servo(int id, RegisterInterface regint) {
-		super(id, Direction.OUTPUT, regint);
+
+	protected Servo(int id, RegisterInterface regInt) {
+		super(id, regInt, false);
 	}
 
 	@Override
-	public boolean isValueAllowed(int i) {
-		return (i>= MIN && i<=MAX);
+	public int getMax() {
+		return MAX;
 	}
 
 	@Override
 	public int getBaseAddress() {
-		return MicroFPGAController.ADDR_SERVO;
+		return Signal.ADDR_SERVO;
 	}
-
 }

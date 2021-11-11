@@ -1,6 +1,5 @@
 package de.embl.rieslab.microfpga.devices;
 
-import de.embl.rieslab.microfpga.MicroFPGAController;
 import de.embl.rieslab.microfpga.regint.RegisterInterface;
 
 import java.util.HashMap;
@@ -18,6 +17,15 @@ public class CameraTrigger {
 
         public int getValue(){
             return val;
+        }
+
+        public static CameraTriggerMode getMode(int i){
+            switch (i){
+                case 1:
+                    return ACTIVE;
+                default:
+                    return PASSIVE;
+            }
         }
     }
 
@@ -45,6 +53,13 @@ public class CameraTrigger {
             setPeriodMs(period);
             setExposureMs(exposure);
             setDelayMs(delay);
+        }
+
+        protected Parameters(int pulse, int period, int exposure, int delay){
+            pulse_ = pulse;
+            period_ = period;
+            exposure_ = exposure;
+            delay_ = delay;
         }
 
         public void setPulseMs(double pulse){
@@ -95,14 +110,14 @@ public class CameraTrigger {
 
         public double getDelayMs(){return delay_ / 100.;}
 
-        public void setParametersMs(double pulse, double period, double exposure, double delay){
+        public void setValuesMs(double pulse, double period, double exposure, double delay){
             setPulseMs(pulse);
             setPeriodMs(period);
             setExposureMs(exposure);
             setDelayMs(delay);
         }
 
-        public HashMap<String, Double> getParametersMs(){
+        public HashMap<String, Double> getValuesMs(){
             HashMap map = new HashMap<String, Double>(4);
 
             map.put(KEY_PULSE, getPulseMs());
@@ -113,7 +128,7 @@ public class CameraTrigger {
             return map;
         }
 
-        protected HashMap<String, Integer> getParameters(){
+        protected HashMap<String, Integer> getIntValues(){
             HashMap map = new HashMap<String, Double>(4);
 
             map.put(KEY_PULSE, pulse_);
@@ -122,6 +137,16 @@ public class CameraTrigger {
             map.put(KEY_DELAY, delay_);
 
             return map;
+        }
+
+        @Override
+        public String toString(){
+            String s = "["+KEY_PULSE+": "+getPulseMs()+" ms, "
+                    +KEY_PERIOD+": "+getPeriodMs()+" ms, "
+                    +KEY_EXPOSURE+": "+getExposureMs()+" ms, "
+                    +KEY_DELAY+": "+getDelayMs()+" ms]";
+
+            return s;
         }
     }
 
@@ -166,7 +191,7 @@ public class CameraTrigger {
     }
 
     public boolean setParameters(Parameters params){
-        HashMap<String, Integer> map = params.getParameters();
+        HashMap<String, Integer> map = params.getIntValues();
 
         boolean b = pulse_.setState(map.get(Parameters.KEY_PULSE));
         if(!b) return false;
@@ -180,6 +205,22 @@ public class CameraTrigger {
         b = delay_.setState(map.get(Parameters.KEY_DELAY));
 
         return b;
+    }
+
+    public Parameters getParameters(){
+
+        Parameters p = new Parameters(
+                pulse_.getState(),
+                period_.getState(),
+                exposure_.getState(),
+                delay_.getState()
+        );
+
+        return p;
+    }
+
+    public String getParametersPretty() {
+        return getParameters().toString();
     }
 
     public class Mode extends Signal{
@@ -199,7 +240,7 @@ public class CameraTrigger {
 
         @Override
         public int getBaseAddress() {
-            return MicroFPGAController.ADDR_ACTIVE_TRIGGER;
+            return Signal.ADDR_ACTIVE_TRIGGER;
         }
     }
 
@@ -224,7 +265,7 @@ public class CameraTrigger {
 
         @Override
         public int getBaseAddress() {
-            return MicroFPGAController.ADDR_START_TRIGGER;
+            return Signal.ADDR_START_TRIGGER;
         }
     }
 
@@ -243,7 +284,7 @@ public class CameraTrigger {
 
         @Override
         public int getBaseAddress() {
-            return MicroFPGAController.ADDR_CAM_PULSE;
+            return Signal.ADDR_CAM_PULSE;
         }
     }
 
@@ -262,7 +303,7 @@ public class CameraTrigger {
 
         @Override
         public int getBaseAddress() {
-            return MicroFPGAController.ADDR_CAM_PERIOD;
+            return Signal.ADDR_CAM_PERIOD;
         }
     }
 
@@ -281,7 +322,7 @@ public class CameraTrigger {
 
         @Override
         public int getBaseAddress() {
-            return MicroFPGAController.ADDR_CAM_EXPO;
+            return Signal.ADDR_CAM_EXPO;
         }
     }
 
@@ -300,7 +341,7 @@ public class CameraTrigger {
 
         @Override
         public int getBaseAddress() {
-            return MicroFPGAController.ADDR_LASER_DELAY;
+            return Signal.ADDR_LASER_DELAY;
         }
     }
 }

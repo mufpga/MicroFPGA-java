@@ -1,6 +1,7 @@
-package de.embl.rieslab.microfpga;
+package de.embl.rieslab.microfrpga.examples;
 
 
+import de.embl.rieslab.microfpga.MicroFPGAController;
 import de.embl.rieslab.microfpga.devices.LaserTrigger;
 
 /**
@@ -21,7 +22,7 @@ public class Example {
 
 		try {
 			// connects to the FPGA
-			MicroFPGAController controller = new MicroFPGAController(num_lasers, num_ttl, num_servos, num_pwm, num_ai);
+			MicroFPGAController controller = new MicroFPGAController(num_lasers, num_ttl, num_servos, num_pwm, num_ai, false);
 
 			// prints ID (Au or Cu)
 			System.out.println("Connected to " + controller.getID());
@@ -50,7 +51,7 @@ public class Example {
 			 * For lasers, the parameters can be changed individually...
 			 */
 			int laser_id = 2;
-			int new_mode = LaserTrigger.Mode.MODE_RISING;
+			int new_mode = LaserTrigger.LaserTriggerMode.RISING.getValue();
 			int new_duration = 2000; // us
 			int new_sequence = LaserTrigger.formatSequence("1010101010101010"); // binary string of length 16
 
@@ -69,7 +70,7 @@ public class Example {
 			/*
 			 * ... or in bulk
 			 */
-			new_mode = LaserTrigger.Mode.MODE_FOLLOWING;
+			new_mode = LaserTrigger.LaserTriggerMode.RISING.getValue();
 			new_duration = 30; // us
 			new_sequence = LaserTrigger.formatSequence("1100110011001100"); // binary string of length 16
 			controller.setLaserState(laser_id, new_mode, new_duration, new_sequence);
