@@ -69,7 +69,7 @@ public class Example {
 			/*
 			 * ... or in bulk
 			 */
-			new_mode = LaserTrigger.Mode.MODE_CAMERA;
+			new_mode = LaserTrigger.Mode.MODE_FOLLOWING;
 			new_duration = 30; // us
 			new_sequence = LaserTrigger.formatSequence("1100110011001100"); // binary string of length 16
 			controller.setLaserState(laser_id, new_mode, new_duration, new_sequence);

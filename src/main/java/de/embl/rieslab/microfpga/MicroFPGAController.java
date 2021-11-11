@@ -12,28 +12,37 @@ import de.embl.rieslab.microfpga.regint.RegisterInterface;
 
 public class MicroFPGAController {
 
-	public final static int MAX_TTL = 5;
-	public final static int MAX_PWM = 5;
-	public final static int MAX_LASER = 8;
-	public final static int MAX_SERVO = 7;
-	public final static int MAX_AI = 8;
+	public final static int NM_TTL = 4;
+	public final static int NM_PWM = 5;
+	public final static int NM_LASER = 8;
+	public final static int NM_SERVO = 7;
+	public final static int NM_AI = 8;
 	
 	public final static int ADDR_MODE = 0;
-	public static final int ADDR_DURA = ADDR_MODE+MAX_LASER;
-	public static final int ADDR_SEQ = ADDR_DURA+MAX_LASER;
-	public static final int ADDR_TTL = ADDR_SEQ+MAX_LASER;
-	public static final int ADDR_SERVO = ADDR_TTL+MAX_TTL;
-	public static final int ADDR_PWM = ADDR_SERVO+MAX_SERVO;
-	public static final int ADDR_ANALOG_INPUT = ADDR_PWM+MAX_PWM;
+	public static final int ADDR_DURA = ADDR_MODE+ NM_LASER;
+	public static final int ADDR_SEQ = ADDR_DURA+ NM_LASER;
+	public static final int ADDR_TTL = ADDR_SEQ+ NM_LASER;
+	public static final int ADDR_SERVO = ADDR_TTL+ NM_TTL;
+	public static final int ADDR_PWM = ADDR_SERVO+ NM_SERVO;
+
+	public static final int ADDR_ACTIVE_TRIGGER = ADDR_PWM + NM_PWM;
+	public static final int ADDR_START_TRIGGER = ADDR_ACTIVE_TRIGGER + 1;
+	public static final int ADDR_CAM_PULSE = ADDR_START_TRIGGER + 1;
+	public static final int ADDR_CAM_PERIOD = ADDR_CAM_PULSE + 1;
+	public static final int ADDR_CAM_EXPO = ADDR_CAM_PERIOD + 1;
+	public static final int ADDR_LASER_DELAY = ADDR_CAM_EXPO + 1;
+
+	public static final int ADDR_ANALOG_INPUT = ADDR_LASER_DELAY + 1;
 	
-	public static final int ADDR_VERSION = 100;
-	public static final int ADDR_ID = 101;
+	public static final int ADDR_VERSION = 200;
+	public static final int ADDR_ID = 201;
 	
 	public static final int ERROR_UNKNOWN_COMMAND = 11206655;
 
 	public static final int ID_AU = 79;
+	public static final int ID_AUP = 80;
 	public static final int ID_CU = 29;
-	public static final int CURRENT_VERSION = 2;
+	public static final int CURRENT_VERSION = 3;
 	
 	private ArrayList<TTL> ttls_;
 	private ArrayList<PWM> pwms_;
@@ -58,7 +67,8 @@ public class MicroFPGAController {
 			version_  = regint_.read(ADDR_VERSION);
 			id_ = regint_.read(ADDR_ID);
 			
-			if(CURRENT_VERSION == version_ && ( (id_ == ID_AU) || (id_ == ID_CU) ) ) {
+			if(CURRENT_VERSION == version_ &&
+					( (id_ == ID_AU) ||(id_ == ID_AUP) || (id_ == ID_CU) ) ) {
 				DeviceFactory factory = new DeviceFactory(regint_);
 				
 				ttls_ = new ArrayList<TTL>();
@@ -80,7 +90,7 @@ public class MicroFPGAController {
 					servos_.add(factory.getServo());
 				}
 
-				if ((id_ == ID_AU)) {
+				if ((id_ == ID_AU) || (id_ == ID_AUP)) {
 					for (int i = 0; i < nAIs; i++) {
 						ais_.add(factory.getAI());
 					}
@@ -91,7 +101,7 @@ public class MicroFPGAController {
 				if(CURRENT_VERSION != version_) {
 					throw new Exception("Incorrect firmware version ("+version_+"), expected version 2.");
 				}
-				if(( (id_ != ID_AU) && (id_ != ID_CU) ) ) {
+				if( (id_ != ID_AU) && (id_ != ID_AUP) && (id_ != ID_CU) ) {
 					throw new Exception("Unknown device id ("+id_+"), expected version 49 (Cu) or 79 (Au).");
 				}
 			}
