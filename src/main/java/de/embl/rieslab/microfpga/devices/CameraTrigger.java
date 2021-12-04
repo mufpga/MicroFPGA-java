@@ -61,6 +61,8 @@ public class CameraTrigger {
         return mode_.setTriggerMode(CameraTriggerMode.PASSIVE);
     }
 
+    public boolean isActiveTrigger() {return mode_.getTriggerMode() == CameraTriggerMode.ACTIVE.getValue();}
+
     public boolean start(){
         return start_.start();
     }
@@ -115,6 +117,10 @@ public class CameraTrigger {
 
         public boolean setTriggerMode(CameraTrigger.CameraTriggerMode mode) {
             return regInt_.write(getBaseAddress(), mode.getValue());
+        }
+
+        public int getTriggerMode(){
+            return regInt_.read(getBaseAddress());
         }
 
         @Override

@@ -60,23 +60,28 @@ public class Example04_SwitchTrigger {
 
                 // start the camera
                 controller.startCamera();
+                System.out.println("Camera running");
 
-                // wait for 10 s
+                // wait for 2 s
                 // in the meantime, both camera and laser output triggers are generated
-                Thread.sleep(5000);
+                Thread.sleep(2000);
 
                 // stop the camera, both camera and lasers signals are now 0
                 controller.stopCamera();
+                System.out.println("Camera stopped");
 
                 // we can set the camera trigger mode to passive
+                System.out.println("Active camera trigger mode: "+controller.isActiveTrigger());
                 controller.setPassiveTrigger();
+                System.out.println("Active camera trigger mode: "+controller.isActiveTrigger());
 
                 // now the lasers are only triggered if an external camera trigger is given in
                 // input to the FPGA
-                Thread.sleep(2000);
+                Thread.sleep(500);
 
                 // if we switch back to active trigger, the previous camera parameters are still in effect
                 controller.setActiveTrigger();
+                System.out.println("Active camera trigger mode: "+controller.isActiveTrigger());
 
                 // disconnect from the port
                 controller.disconnect();

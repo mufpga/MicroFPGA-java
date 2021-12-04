@@ -25,7 +25,7 @@ public class RegisterInterface {
 
 		boolean b = serialPort_.openPort();
 		
-		serialPort_.setComPortParameters(1000000, 8, 1, 0);
+		serialPort_.setComPortParameters(57600, 8, 1, 0);
 		serialPort_.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
 		
 		return b;

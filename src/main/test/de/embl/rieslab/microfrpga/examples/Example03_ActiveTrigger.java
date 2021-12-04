@@ -110,13 +110,15 @@ public class Example03_ActiveTrigger {
 
                 // start the camera
                 controller.startCamera();
+                System.out.println("Camera running");
 
-                // wait for 10 s
+                // wait for 2 s
                 // in the meantime, both camera and laser output triggers are generated
-                Thread.sleep(10000);
+                Thread.sleep(2000);
 
                 // stop the camera, both camera and lasers signals are now 0
                 controller.stopCamera();
+                System.out.println("Camera stopped");
 
                 // disconnect from the port
                 controller.disconnect();

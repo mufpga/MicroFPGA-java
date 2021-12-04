@@ -228,6 +228,11 @@ public class MicroFPGAController {
 		else return false;
 	}
 
+	public boolean isActiveTrigger(){
+		if(connected_ && cam_ != null) return cam_.isActiveTrigger();
+		else return false;
+	}
+
 	public boolean startCamera(){
 		if(connected_ && cam_ != null) return cam_.start();
 		else return false;
