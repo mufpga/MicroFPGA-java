@@ -33,7 +33,8 @@ public class MicroFPGAController {
 			id_ = regint_.read(Signal.ADDR_ID);
 			
 			if(Signal.CURRENT_VERSION == version_ &&
-					( (id_ == Signal.ID_AU) ||(id_ == Signal.ID_AUP) || (id_ == Signal.ID_CU) ) ) {
+					( (id_ == Signal.ID_AU) ||(id_ == Signal.ID_AUP) ||
+							(id_ == Signal.ID_CU) || (id_ == Signal.ID_MOJO) ) ) {
 				DeviceFactory factory = new DeviceFactory(regint_);
 				
 				ttls_ = new ArrayList<TTL>();
@@ -55,7 +56,7 @@ public class MicroFPGAController {
 					servos_.add(factory.getServo());
 				}
 
-				if ((id_ == Signal.ID_AU) || (id_ == Signal.ID_AUP)) {
+				if ((id_ == Signal.ID_AU) || (id_ == Signal.ID_AUP) || (id_ == Signal.ID_MOJO)) {
 					for (int i = 0; i < nAIs; i++) {
 						ais_.add(factory.getAI());
 					}
@@ -73,8 +74,8 @@ public class MicroFPGAController {
 				if(Signal.CURRENT_VERSION != version_) {
 					throw new Exception("Incorrect firmware version ("+version_+"), expected version 2.");
 				}
-				if( (id_ != Signal.ID_AU) && (id_ != Signal.ID_AUP) && (id_ != Signal.ID_CU) ) {
-					throw new Exception("Unknown device id ("+id_+"), expected version 49 (Cu), 79 (Au) or 80 (Au+).");
+				if( (id_ != Signal.ID_AU) && (id_ != Signal.ID_AUP) && (id_ != Signal.ID_CU) && (id_ != Signal.ID_MOJO) ) {
+					throw new Exception("Unknown device id ("+id_+"), expected version 12 (Mojo), 49 (Cu), 79 (Au) or 80 (Au+).");
 				}
 			}
 		} else {
@@ -268,6 +269,8 @@ public class MicroFPGAController {
 					return "Cu";
 				case Signal.ID_AUP:
 					return "Au+";
+				case Signal.ID_MOJO:
+					return "Mojo";
 			}
 			return "Unknown device";
 		}

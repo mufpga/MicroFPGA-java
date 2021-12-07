@@ -34,6 +34,7 @@ public abstract class Signal {
 	public static final int ID_AU = 79;
 	public static final int ID_AUP = 80;
 	public static final int ID_CU = 29;
+	public static final int ID_MOJO = 12;
 	public static final int CURRENT_VERSION = 3;
 
 	private final boolean readOnly_;
