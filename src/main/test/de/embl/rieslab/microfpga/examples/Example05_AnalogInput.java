@@ -1,4 +1,4 @@
-package de.embl.rieslab.microfrpga.examples;
+package de.embl.rieslab.microfpga.examples;
 
 import de.embl.rieslab.microfpga.MicroFPGAController;
 
