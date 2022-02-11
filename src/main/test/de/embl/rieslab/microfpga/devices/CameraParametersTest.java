@@ -13,58 +13,54 @@ public class CameraParametersTest {
     @Test
     public void testDoubleValues(){
 
-        /*
-        pulse, period and exposure go in steps of 0.1 ms,
-        while delay goes in steps of 0.01 ms.
-         */
         final double pulse = 1.5;
-        final double period = 45.8;
+        final double readout = 2.8;
         final double exposure = 30.0;
         final double delay = 1.64;
 
         CameraParameters p = new CameraParameters(
-                pulse, period, exposure, delay
+                pulse, delay, exposure, readout
         );
 
         assertEquals(pulse, p.getPulseMs(), eps);
-        assertEquals(period, p.getPeriodMs(), eps);
-        assertEquals(exposure, p.getExposureMs(), eps);
         assertEquals(delay, p.getDelayMs(), eps);
+        assertEquals(exposure, p.getExposureMs(), eps);
+        assertEquals(readout, p.getReadoutMs(), eps);
 
-        // if the values have the wrong precision, they
-        // are thresholded to the nearest step
-        p.setPulseMs(pulse + 0.01);
-        p.setPeriodMs(period - 0.02);
-        p.setExposureMs(exposure + 0.07);
-        p.setDelayMs(delay - 0.008);
+        // if the values have the wrong precision (last digit is smaller than a
+        // micro-second), they are thresholded to the nearest step (nearest us value)
+        p.setPulseMs(pulse + 0.0001);
+        p.setDelayMs(delay - 0.0008);
+        p.setExposureMs(exposure + 0.0007);
+        p.setReadoutMs(readout - 0.0002);
 
         assertEquals(pulse, p.getPulseMs(), eps);
-        assertEquals(period, p.getPeriodMs(), eps);
-        assertEquals(exposure+0.1, p.getExposureMs(), eps);
-        assertEquals(delay-0.01, p.getDelayMs(), eps);
+        assertEquals(delay-0.001, p.getDelayMs(), eps);
+        assertEquals(exposure+0.001, p.getExposureMs(), eps);
+        assertEquals(readout, p.getReadoutMs(), eps);
     }
 
     @Test
     public void testIntValues(){
         /*
-        pulse, period and exposure go in steps of 0.1 ms,
+        pulse, readout and exposure go in steps of 0.1 ms,
         while delay goes in steps of 0.01 ms.
          */
         final int pulse = 15;
-        final int period = 458;
-        final int exposure = 300;
         final int delay = 164;
+        final int exposure = 300;
+        final int readout = 158;
 
         // use the int constructor
         CameraParameters p = new CameraParameters(
-                pulse, period, exposure, delay
+                pulse, delay, exposure, readout
         );
 
         HashMap<String, Integer> vals = p.getIntValues();
 
         assertEquals(pulse, vals.get(CameraParameters.KEY_PULSE), eps);
-        assertEquals(period, vals.get(CameraParameters.KEY_PERIOD), eps);
-        assertEquals(exposure, vals.get(CameraParameters.KEY_EXPOSURE), eps);
         assertEquals(delay, vals.get(CameraParameters.KEY_DELAY), eps);
+        assertEquals(exposure, vals.get(CameraParameters.KEY_EXPOSURE), eps);
+        assertEquals(readout, vals.get(CameraParameters.KEY_READOUT), eps);
     }
 }

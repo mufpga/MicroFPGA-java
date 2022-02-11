@@ -65,7 +65,7 @@ public class MicroFPGAController {
 				if(useCamera){
 					cam_ = factory.getCameraTrigger();
 				} else {
-					factory.getCameraTrigger().setPassiveTrigger();
+					factory.getCameraTrigger().setPassiveSync();
 				}
 
 			} else {
@@ -219,18 +219,18 @@ public class MicroFPGAController {
 		return -1;
 	}
 
-	public boolean setActiveTrigger(){
-		if(connected_ && cam_ != null) return cam_.setActiveTrigger();
+	public boolean setActiveSync(){
+		if(connected_ && cam_ != null) return cam_.setActiveSync();
 		else return false;
 	}
 
-	public boolean setPassiveTrigger(){
-		if(connected_ && cam_ != null) return cam_.setPassiveTrigger();
+	public boolean setPassiveSync(){
+		if(connected_ && cam_ != null) return cam_.setPassiveSync();
 		else return false;
 	}
 
-	public boolean isActiveTrigger(){
-		if(connected_ && cam_ != null) return cam_.isActiveTrigger();
+	public boolean isActiveSync(){
+		if(connected_ && cam_ != null) return cam_.isActiveSync();
 		else return false;
 	}
 

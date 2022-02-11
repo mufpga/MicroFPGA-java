@@ -6,7 +6,7 @@ import de.embl.rieslab.microfpga.devices.LaserParameters;
 import de.embl.rieslab.microfpga.devices.LaserTriggerMode;
 
 /**
- * Illustrate how to switch camera trigger mode.
+ * Illustrate how to switch camera synchronisation mode.
  *
  * @author Joran Deschamps
  *
@@ -31,14 +31,14 @@ public class Example04_SwitchTrigger {
                 System.out.println("Connected to " + controller.getID());
 
                 // first we make sure that the camera trigger mode is set to active
-                controller.setActiveTrigger();
+                controller.setActiveSync();
 
                 // then we create the parameters
                 CameraParameters p = new CameraParameters(
-                        1,      // pulse in ms length of the signal triggering the camera
-                        31.5,   // period in ms of the signal triggering the camera
+                        1,      // pulse in ms length of the signal triggering the camera (fire signal)
+                        0.5,   // delay of the laser trigger signal with respect to the camera trigger signal
                         30,   // exposure in ms
-                        0.5      // delay of the laser trigger signal with respect to the camera trigger signal
+                        1.5      // period between the end of the exposure and the next fire pulse
                 );
 
                 // the parameters need to be applied
@@ -70,18 +70,18 @@ public class Example04_SwitchTrigger {
                 controller.stopCamera();
                 System.out.println("Camera stopped");
 
-                // we can set the camera trigger mode to passive
-                System.out.println("Active camera trigger mode: "+controller.isActiveTrigger());
-                controller.setPassiveTrigger();
-                System.out.println("Active camera trigger mode: "+controller.isActiveTrigger());
+                // we can set the camera sync mode to passive
+                System.out.println("Active camera sync mode: "+controller.isActiveSync());
+                controller.setPassiveSync();
+                System.out.println("Active camera sync mode: "+controller.isActiveSync());
 
                 // now the lasers are only triggered if an external camera trigger is given in
                 // input to the FPGA
                 Thread.sleep(500);
 
-                // if we switch back to active trigger, the previous camera parameters are still in effect
-                controller.setActiveTrigger();
-                System.out.println("Active camera trigger mode: "+controller.isActiveTrigger());
+                // if we switch back to active sync, the previous camera parameters are still in effect
+                controller.setActiveSync();
+                System.out.println("Active camera trigger mode: "+controller.isActiveSync());
 
                 // disconnect from the port
                 controller.disconnect();

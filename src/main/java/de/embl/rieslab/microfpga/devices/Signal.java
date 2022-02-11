@@ -17,11 +17,11 @@ public abstract class Signal {
 	public static final int ADDR_SERVO = ADDR_TTL+ NM_TTL;
 	public static final int ADDR_PWM = ADDR_SERVO+ NM_SERVO;
 
-	public static final int ADDR_ACTIVE_TRIGGER = ADDR_PWM + NM_PWM;
-	public static final int ADDR_START_TRIGGER = ADDR_ACTIVE_TRIGGER + 1;
+	public static final int ADDR_ACTIVE_SYNC = ADDR_PWM + NM_PWM;
+	public static final int ADDR_START_TRIGGER = ADDR_ACTIVE_SYNC + 1;
 	public static final int ADDR_CAM_PULSE = ADDR_START_TRIGGER + 1;
-	public static final int ADDR_CAM_PERIOD = ADDR_CAM_PULSE + 1;
-	public static final int ADDR_CAM_EXPO = ADDR_CAM_PERIOD + 1;
+	public static final int ADDR_CAM_READOUT = ADDR_CAM_PULSE + 1;
+	public static final int ADDR_CAM_EXPO = ADDR_CAM_READOUT + 1;
 	public static final int ADDR_LASER_DELAY = ADDR_CAM_EXPO + 1;
 
 	public static final int ADDR_ANALOG_INPUT = ADDR_LASER_DELAY + 1;

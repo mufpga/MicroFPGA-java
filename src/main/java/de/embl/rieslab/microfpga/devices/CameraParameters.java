@@ -6,37 +6,37 @@ import java.util.HashMap;
  * Class holding the camera trigger module parameters and
  * allowing users to pass them in ms.
  *
- * Maximum pulse, period and exposure are 6553,5 ms, while
- * the maximum delay is 655,35 ms.
+ * Maximum delay and readout are 65,535 ms, while
+ * the maximum pulse and exposure are 1048,575 ms.
  */
 public class CameraParameters {
 
     public final static String KEY_PULSE = "Pulse";
-    public final static String KEY_PERIOD = "Period";
+    public final static String KEY_READOUT = "Read-out";
     public final static String KEY_EXPOSURE = "Exposure";
     public final static String KEY_DELAY = "Delay";
 
     private int pulse_;
-    private int period_;
+    private int readout_;
     private int exposure_;
     private int delay_;
 
-    public CameraParameters(double pulse, double period, double exposure, double delay){
+    public CameraParameters(double pulse, double delay, double exposure, double readout){
         setPulseMs(pulse);
-        setPeriodMs(period);
+        setReadoutMs(readout);
         setExposureMs(exposure);
         setDelayMs(delay);
     }
 
-    protected CameraParameters(int pulse, int period, int exposure, int delay){
+    protected CameraParameters(int pulse, int delay, int exposure, int readout){
         pulse_ = pulse;
-        period_ = period;
+        readout_ = readout;
         exposure_ = exposure;
         delay_ = delay;
     }
 
-    public void setPulseMs(double pulse){
-        pulse_ = (int) (pulse*10+0.5);
+    public void setPulseMs(double pulseMs){
+        pulse_ = (int) (pulseMs*1000+0.5);
 
         if(pulse_ > CameraTrigger.Pulse.MAX) {
             pulse_ = CameraTrigger.Pulse.MAX;
@@ -45,18 +45,18 @@ public class CameraParameters {
         }
     }
 
-    public void setPeriodMs(double period){
-        period_ = (int) (period*10+0.5);
+    public void setReadoutMs(double readoutMs){
+        readout_ = (int) (readoutMs*1000+0.5);
 
-        if(period_ > CameraTrigger.Period.MAX) {
-            period_ = CameraTrigger.Period.MAX;
-        } else if(period_ < 0){
-            period_ = 0;
+        if(readout_ > CameraTrigger.Readout.MAX) {
+            readout_ = CameraTrigger.Readout.MAX;
+        } else if(readout_ < 0){
+            readout_ = 0;
         }
     }
 
-    public void setExposureMs(double exposure){
-        exposure_ = (int) (exposure*10+0.5);
+    public void setExposureMs(double exposureMs){
+        exposure_ = (int) (exposureMs*1000+0.5);
 
         if(exposure_ > CameraTrigger.Exposure.MAX) {
             exposure_ = CameraTrigger.Exposure.MAX;
@@ -65,8 +65,8 @@ public class CameraParameters {
         }
     }
 
-    public void setDelayMs(double delay){
-        delay_ = (int) (delay*100+0.5);
+    public void setDelayMs(double delayMs){
+        delay_ = (int) (delayMs*1000+0.5);
 
         if(pulse_ > CameraTrigger.Exposure.MAX) {
             pulse_ = CameraTrigger.Exposure.MAX;
@@ -75,17 +75,17 @@ public class CameraParameters {
         }
     }
 
-    public double getPulseMs(){return pulse_ / 10.;}
+    public double getPulseMs(){return pulse_ / 1000.;}
 
-    public double getPeriodMs(){return period_ / 10.;}
+    public double getReadoutMs(){return readout_ / 1000.;}
 
-    public double getExposureMs(){return exposure_ / 10.;}
+    public double getExposureMs(){return exposure_ / 1000.;}
 
-    public double getDelayMs(){return delay_ / 100.;}
+    public double getDelayMs(){return delay_ / 1000.;}
 
-    public void setValuesMs(double pulse, double period, double exposure, double delay){
+    public void setValuesMs(double pulse, double delay, double exposure, double readout){
         setPulseMs(pulse);
-        setPeriodMs(period);
+        setReadoutMs(readout);
         setExposureMs(exposure);
         setDelayMs(delay);
     }
@@ -94,7 +94,7 @@ public class CameraParameters {
         HashMap map = new HashMap<String, Double>(4);
 
         map.put(KEY_PULSE, getPulseMs());
-        map.put(KEY_PERIOD, getPeriodMs());
+        map.put(KEY_READOUT, getReadoutMs());
         map.put(KEY_EXPOSURE, getExposureMs());
         map.put(KEY_DELAY, getDelayMs());
 
@@ -105,7 +105,7 @@ public class CameraParameters {
         HashMap map = new HashMap<String, Double>(4);
 
         map.put(KEY_PULSE, pulse_);
-        map.put(KEY_PERIOD, period_);
+        map.put(KEY_READOUT, readout_);
         map.put(KEY_EXPOSURE, exposure_);
         map.put(KEY_DELAY, delay_);
 
@@ -115,9 +115,9 @@ public class CameraParameters {
     @Override
     public String toString(){
         String s = "["+KEY_PULSE+": "+getPulseMs()+" ms, "
-                +KEY_PERIOD+": "+getPeriodMs()+" ms, "
+                + KEY_DELAY +": "+ getDelayMs()+" ms, "
                 +KEY_EXPOSURE+": "+getExposureMs()+" ms, "
-                +KEY_DELAY+": "+getDelayMs()+" ms]";
+                +KEY_READOUT+": "+getReadoutMs()+" ms]";
 
         return s;
     }

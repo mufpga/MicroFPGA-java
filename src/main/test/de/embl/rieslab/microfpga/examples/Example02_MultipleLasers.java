@@ -25,7 +25,7 @@ public class Example02_MultipleLasers {
                     0, // number of servos
                     0,    // number of PWM signals
                     0,     // number of analog inputs (only Au and Au+)
-                    false   // whether we need to change between active/passive camera trigger
+                    false   // whether we need to change between active/passive camera synchronisation
             );
 
             if(controller.isConnected()){

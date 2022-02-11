@@ -17,23 +17,23 @@ import de.embl.rieslab.microfpga.devices.LaserTriggerMode;
  *
  * In addition to the laser trigger parameters, we need to set a number of
  * camera trigger parameters:
- *  - pulse: pulse length in ms of the camera trigger signal, comprised
- *           between 0 and 6553.5 ms in steps of 0.1 ms.
- *  - period: period in ms of the camera trigger signal, comprised
- *  *         between 0 and 6553.5 ms in steps of 0.1 ms.
+ *  - pulse: pulse length in ms of the camera fire signal, comprised
+ *           between 0 and 1048.575 ms in steps of 1 us.
+ *  - readout: period between the end of the exposure and the next fire pulse,
+ *           comprised between 0 and 65.535 ms in steps of 1 us.
  *  - exposure: pulse length in ms of the exposure signal, the period is
  *              the same as the camera trigger signal, and the value is
- *              comprised between 0 and 6553.5 ms in steps of 0.1 ms.
+ *              comprised between 0 and 1048.575 ms in steps of 1 us.
  *  - delay: delay in ms of the exposure signal with respect to the camera
- *          trigger rising edge, comprised between 0 and 655.35 ms in steps
- *          of 0.01 ms.
+ *          trigger rising edge, comprised between 0 and 65.535 ms in steps
+ *          of 1 us.
  *
  *  The signals therefore look like the following:
- *                 <-------------period------------>
+ *                                              <-> readout
  *                <-pulse->
  *                ---------                        ---------      high
  *               |         |                      |         |
- *    camera -----         ------------------------         ----- low
+ *    fire   -----         ------------------------         ----- low
  *
  *                  <---------exposure--------->
  *                   ---------------------------      ----------- high
@@ -56,7 +56,7 @@ public class Example03_ActiveTrigger {
                     0, // number of servos
                     0,    // number of PWM signals
                     0,     // number of analog inputs (only Au and Au+)
-                    true   // in order to use the active camera trigger we need to use the camera module
+                    true   // in order to use the active camera sync we need to use the camera module
             );
 
             if(controller.isConnected()){
@@ -64,19 +64,19 @@ public class Example03_ActiveTrigger {
                 System.out.println("Connected to " + controller.getID());
 
                 // first we make sure that the camera trigger mode is set to active
-                controller.setActiveTrigger();
+                controller.setActiveSync();
 
                 // then we create the parameters
                 CameraParameters p = new CameraParameters(
                         2,      // pulse in ms length of the signal triggering the camera
-                        40,   // period in ms of the signal triggering the camera
+                        1,   // delay of the laser trigger signal with respect to the camera trigger signal
                         25.5,   // exposure in ms
-                        1.2      // delay of the laser trigger signal with respect to the camera trigger signal
+                        1.5      // period between the end of the exposure and the next fire pulse
                 );
 
                 // they can later be changed
                 p.setPulseMs(1);
-                p.setPeriodMs(31.5);
+                p.setReadoutMs(1);
                 p.setExposureMs(30);
                 p.setDelayMs(0.5);
 

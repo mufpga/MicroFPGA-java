@@ -6,12 +6,12 @@ import java.util.HashMap;
 
 public class CameraTrigger {
 
-    public enum CameraTriggerMode{
+    public enum TriggerSyncMode {
         ACTIVE(1), PASSIVE(0);
 
         private final int val;
 
-        CameraTriggerMode(int i){
+        TriggerSyncMode(int i){
             val = i;
         }
 
@@ -19,7 +19,7 @@ public class CameraTrigger {
             return val;
         }
 
-        public static CameraTriggerMode getMode(int i){
+        public static TriggerSyncMode getMode(int i){
             switch (i){
                 case 1:
                     return ACTIVE;
@@ -30,18 +30,18 @@ public class CameraTrigger {
     }
 
     private static CameraTrigger cameraTrigger;
-    private final Mode mode_;
+    private final Mode syncMode_;
     private final Start start_;
     private final Pulse pulse_;
-    private final Period period_;
+    private final Readout readout_;
     private final Exposure exposure_;
     private final Delay delay_;
 
     private CameraTrigger(RegisterInterface regInt){
-        mode_ = new Mode(regInt);
+        syncMode_ = new Mode(regInt);
         start_ = new Start(regInt);
         pulse_ = new Pulse(regInt);
-        period_ = new Period(regInt);
+        readout_ = new Readout(regInt);
         exposure_ = new Exposure(regInt);
         delay_ = new Delay(regInt);
     }
@@ -53,15 +53,15 @@ public class CameraTrigger {
         return cameraTrigger;
     }
 
-    public boolean setActiveTrigger(){
-        return mode_.setTriggerMode(CameraTriggerMode.ACTIVE);
+    public boolean setActiveSync(){
+        return syncMode_.setSyncMode(TriggerSyncMode.ACTIVE);
     }
 
-    public boolean setPassiveTrigger(){
-        return mode_.setTriggerMode(CameraTriggerMode.PASSIVE);
+    public boolean setPassiveSync(){
+        return syncMode_.setSyncMode(TriggerSyncMode.PASSIVE);
     }
 
-    public boolean isActiveTrigger() {return mode_.getTriggerMode() == CameraTriggerMode.ACTIVE.getValue();}
+    public boolean isActiveSync() {return syncMode_.getSyncMode() == TriggerSyncMode.ACTIVE.getValue();}
 
     public boolean start(){
         return start_.start();
@@ -77,7 +77,7 @@ public class CameraTrigger {
         boolean b = pulse_.setState(map.get(CameraParameters.KEY_PULSE));
         if(!b) return false;
 
-        b = period_.setState(map.get(CameraParameters.KEY_PERIOD));
+        b = readout_.setState(map.get(CameraParameters.KEY_READOUT));
         if(!b) return false;
 
         b = exposure_.setState(map.get(CameraParameters.KEY_EXPOSURE));
@@ -92,7 +92,7 @@ public class CameraTrigger {
 
         CameraParameters p = new CameraParameters(
                 pulse_.getState(),
-                period_.getState(),
+                readout_.getState(),
                 exposure_.getState(),
                 delay_.getState()
         );
@@ -115,17 +115,17 @@ public class CameraTrigger {
         @Override
         public int getMax() {return MAX;}
 
-        public boolean setTriggerMode(CameraTrigger.CameraTriggerMode mode) {
+        public boolean setSyncMode(TriggerSyncMode mode) {
             return regInt_.write(getBaseAddress(), mode.getValue());
         }
 
-        public int getTriggerMode(){
+        public int getSyncMode(){
             return regInt_.read(getBaseAddress());
         }
 
         @Override
         public int getBaseAddress() {
-            return Signal.ADDR_ACTIVE_TRIGGER;
+            return Signal.ADDR_ACTIVE_SYNC;
         }
     }
 
@@ -156,7 +156,7 @@ public class CameraTrigger {
 
     public class Pulse extends Signal{
 
-        public static final int MAX = 65535;
+        public static final int MAX = 1048575;
 
         protected Pulse(RegisterInterface regInt) {
             super(0, regInt, false);
@@ -173,11 +173,11 @@ public class CameraTrigger {
         }
     }
 
-    public class Period extends Signal{
+    public class Readout extends Signal{
 
         public static final int MAX = 65535;
 
-        protected Period(RegisterInterface regInt) {
+        protected Readout(RegisterInterface regInt) {
             super(0, regInt, false);
         }
 
@@ -188,13 +188,13 @@ public class CameraTrigger {
 
         @Override
         public int getBaseAddress() {
-            return Signal.ADDR_CAM_PERIOD;
+            return Signal.ADDR_CAM_READOUT;
         }
     }
 
     public class Exposure extends Signal{
 
-        public static final int MAX = 65535;
+        public static final int MAX = 1048575;
 
         protected Exposure(RegisterInterface regInt) {
             super(0, regInt, false);
