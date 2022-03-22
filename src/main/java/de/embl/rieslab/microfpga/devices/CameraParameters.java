@@ -38,8 +38,8 @@ public class CameraParameters {
     public void setPulseMs(double pulseMs){
         pulse_ = (int) (pulseMs*1000+0.5);
 
-        if(pulse_ > CameraTrigger.Pulse.MAX) {
-            pulse_ = CameraTrigger.Pulse.MAX;
+        if(pulse_ > CameraSync.Pulse.MAX) {
+            pulse_ = CameraSync.Pulse.MAX;
         } else if(pulse_ < 0){
             pulse_ = 0;
         }
@@ -48,8 +48,8 @@ public class CameraParameters {
     public void setReadoutMs(double readoutMs){
         readout_ = (int) (readoutMs*1000+0.5);
 
-        if(readout_ > CameraTrigger.Readout.MAX) {
-            readout_ = CameraTrigger.Readout.MAX;
+        if(readout_ > CameraSync.Readout.MAX) {
+            readout_ = CameraSync.Readout.MAX;
         } else if(readout_ < 0){
             readout_ = 0;
         }
@@ -58,8 +58,8 @@ public class CameraParameters {
     public void setExposureMs(double exposureMs){
         exposure_ = (int) (exposureMs*1000+0.5);
 
-        if(exposure_ > CameraTrigger.Exposure.MAX) {
-            exposure_ = CameraTrigger.Exposure.MAX;
+        if(exposure_ > CameraSync.Exposure.MAX) {
+            exposure_ = CameraSync.Exposure.MAX;
         } else if(exposure_ < 0){
             exposure_ = 0;
         }
@@ -68,8 +68,8 @@ public class CameraParameters {
     public void setDelayMs(double delayMs){
         delay_ = (int) (delayMs*1000+0.5);
 
-        if(pulse_ > CameraTrigger.Exposure.MAX) {
-            pulse_ = CameraTrigger.Exposure.MAX;
+        if(pulse_ > CameraSync.Exposure.MAX) {
+            pulse_ = CameraSync.Exposure.MAX;
         } else if(pulse_ < 0){
             pulse_ = 0;
         }

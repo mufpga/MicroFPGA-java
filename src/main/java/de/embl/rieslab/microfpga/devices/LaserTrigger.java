@@ -144,7 +144,7 @@ public class LaserTrigger {
 	
 	public class Duration extends Signal{
 
-		public static final int MAX = 65535;
+		public static final int MAX = 1048575;
 
 		protected Duration(int id, RegisterInterface regint) {
 			super(id, regint, false);

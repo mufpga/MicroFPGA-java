@@ -4,7 +4,7 @@ import de.embl.rieslab.microfpga.regint.RegisterInterface;
 
 import java.util.HashMap;
 
-public class CameraTrigger {
+public class CameraSync {
 
     public enum TriggerSyncMode {
         ACTIVE(1), PASSIVE(0);
@@ -29,16 +29,16 @@ public class CameraTrigger {
         }
     }
 
-    private static CameraTrigger cameraTrigger;
-    private final Mode syncMode_;
+    private static CameraSync cameraSync;
+    private final SyncMode syncSyncMode_;
     private final Start start_;
     private final Pulse pulse_;
     private final Readout readout_;
     private final Exposure exposure_;
     private final Delay delay_;
 
-    private CameraTrigger(RegisterInterface regInt){
-        syncMode_ = new Mode(regInt);
+    private CameraSync(RegisterInterface regInt){
+        syncSyncMode_ = new SyncMode(regInt);
         start_ = new Start(regInt);
         pulse_ = new Pulse(regInt);
         readout_ = new Readout(regInt);
@@ -46,22 +46,22 @@ public class CameraTrigger {
         delay_ = new Delay(regInt);
     }
 
-    public static CameraTrigger getInstance(RegisterInterface regInt){
-        if(cameraTrigger == null){
-            cameraTrigger = new CameraTrigger(regInt);
+    public static CameraSync getInstance(RegisterInterface regInt){
+        if(cameraSync == null){
+            cameraSync = new CameraSync(regInt);
         }
-        return cameraTrigger;
+        return cameraSync;
     }
 
     public boolean setActiveSync(){
-        return syncMode_.setSyncMode(TriggerSyncMode.ACTIVE);
+        return syncSyncMode_.setSyncMode(TriggerSyncMode.ACTIVE);
     }
 
     public boolean setPassiveSync(){
-        return syncMode_.setSyncMode(TriggerSyncMode.PASSIVE);
+        return syncSyncMode_.setSyncMode(TriggerSyncMode.PASSIVE);
     }
 
-    public boolean isActiveSync() {return syncMode_.getSyncMode() == TriggerSyncMode.ACTIVE.getValue();}
+    public boolean isActiveSync() {return syncSyncMode_.getSyncMode() == TriggerSyncMode.ACTIVE.getValue();}
 
     public boolean start(){
         return start_.start();
@@ -104,11 +104,11 @@ public class CameraTrigger {
         return getParameters().toString();
     }
 
-    public class Mode extends Signal{
+    public class SyncMode extends Signal{
 
         public static final int MAX = 1;
 
-        protected Mode(RegisterInterface regInt) {
+        protected SyncMode(RegisterInterface regInt) {
             super(0, regInt, false);
         }
 

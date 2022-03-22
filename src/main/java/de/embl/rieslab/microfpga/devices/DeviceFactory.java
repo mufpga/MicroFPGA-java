@@ -55,10 +55,10 @@ public class DeviceFactory {
 		return null;
 	}
 
-	public CameraTrigger getCameraTrigger(){
+	public CameraSync getCameraTrigger(){
 		if(counterCamera_ < 1){
 			counterCamera_++;
-			return CameraTrigger.getInstance(regInt_);
+			return CameraSync.getInstance(regInt_);
 		}
 		return null;
 	}

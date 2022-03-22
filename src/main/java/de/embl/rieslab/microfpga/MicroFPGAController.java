@@ -12,7 +12,7 @@ public class MicroFPGAController {
 	private ArrayList<LaserTrigger> lasers_;
 	private ArrayList<Servo> servos_;
 	private ArrayList<AnalogInput> ais_;
-	private CameraTrigger cam_;
+	private CameraSync cam_;
 	
 	private boolean connected_;
 	
