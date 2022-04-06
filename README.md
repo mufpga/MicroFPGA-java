@@ -18,7 +18,7 @@ Documentation and tutorials are available on [https://mufpga.github.io/](https:/
 
 ## Content
 
-This repository contains the Python package to control MicroFPGA. To use `Microfpga` in you Java project, you can add it as a Maven dependency:
+This repository contains the Java package to control MicroFPGA. To use `Microfpga` in you Java project, you can add it as a Maven dependency:
 
 ```bash
 ??
