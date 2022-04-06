@@ -40,5 +40,5 @@ Deschamps J, Kieser C, Hoess P, Deguchi T and Ries J,
 
 --->
 
-MicroFPGA was written by Joran Deschamps, EMBL (2020).
+MicroFPGA-java was written by Joran Deschamps, EMBL (2020).
 
