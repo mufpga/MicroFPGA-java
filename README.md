@@ -24,13 +24,13 @@ This repository contains the Python package to control MicroFPGA. To use `Microf
 ??
 ```
 
-Alternatively, you can [download]() the compiled `.jar` or build it from source using maven:
+Alternatively, you can [download](https://github.com/mufpga/MicroFPGA-java/releases) the compiled `.jar` or build it from source using maven:
 
 ``` bash
 mvn package -Dmaven.test.skip=true
 ```
 
-This repository also contains examples on how to use MicroFPGA.
+This repository also contains [examples](https://github.com/mufpga/MicroFPGA-java/tree/main/src/main/test/de/embl/rieslab/microfpga/examples) on how to use MicroFPGA.
 
 <!---
 
