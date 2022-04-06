@@ -1,12 +1,44 @@
-# MicroFPGA Java library
+<a href="https://mufpga.github.io/"><img src="https://raw.githubusercontent.com/mufpga/mufpga.github.io/main/img/logo_title.png" alt="Overview"/>
 
-[MicroFPGA](https://mufpga.github.io) is an FPGA-based platform for the electronic control of microscopes. It aims at using affordable FPGA to generate or read signals from a variety of devices, including cameras, lasers, servomotors, filter-wheels, etc. It can be controlled via [Micro-Manager](https://micro-manager.org/), or its Java, [Python](https://github.com/mufpga/MicroFPGA-py) and [LabView](https://github.com/mufpga/MicroFPGA-labview) communication libraries, and comes with optional complementary [electronics](https://github.com/mufpga/MicroFPGA-electronics).
+</a>
+
+![version](https://img.shields.io/badge/version-3.1-blue)
+
+
+
+# Overview
+
+MicroFPGA is an FPGA-based platform for the electronic control of microscopes. It aims at using affordable FPGA to generate or read signals from a variety of devices, including cameras, lasers, servomotors, filter-wheels, etc. It can be controlled via [Micro-Manager](https://micro-manager.org/MicroFPGA), or its [Java](https://github.com/mufpga/MicroFPGA-java), [Python](https://github.com/mufpga/MicroFPGA-py) and [LabView](https://github.com/mufpga/MicroFPGA-labview) communication libraries, and comes with optional complementary [electronics](https://github.com/mufpga/MicroFPGA-electronics).
+
+Documentation and tutorials are available on [https://mufpga.github.io/](https://mufpga.github.io/).
+
+
+
+<img src="https://raw.githubusercontent.com/mufpga/mufpga.github.io/main/img/figs/G_overview.png" alt="Overview"/>
 
 ## Content
 
-This repository contains the Java communication library. Examples on how to use the library can be found in the [test package](https://github.com/mufpga/MicroFPGA-java/tree/main/src/main/test/de/embl/rieslab/microfpga/examples). This maven project can easily be imported into IntelliJ or Eclipse.
+This repository contains the Python package to control MicroFPGA. To use `Microfpga` in you Java project, you can add it as a Maven dependency:
 
-#### Check out the project homepage for the documentation, resources and tutorials: [mufpga.github.io](https://mufpga.github.io).
+```bash
+??
+```
 
-MicroFPGA was written by Joran Deschamps, EMBL (2020). It was tested with Java JDK 17 and IntelliJ 2021.2.3.
+Alternatively, you can [download]() the compiled `.jar` or build it from source using maven:
+
+``` bash
+mvn package -Dmaven.test.skip=true
+```
+
+This repository also contains examples on how to use MicroFPGA.
+
+<!---
+
+## Cite us
+
+Deschamps J, Kieser C, Hoess P, Deguchi T and Ries J, 
+
+--->
+
+MicroFPGA was written by Joran Deschamps, EMBL (2020).
 
